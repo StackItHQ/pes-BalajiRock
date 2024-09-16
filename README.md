@@ -45,11 +45,11 @@ Once you're done, make sure you **record a video** showing your project working.
 
 We have a checklist at the bottom of this README file, which you should update as your progress with your assignment. It will help us evaluate your project.
 
-- [ ] My code's working just fine! 🥳
-- [ ] I have recorded a video showing it working and embedded it in the README ▶️
-- [ ] I have tested all the normal working cases 😎
-- [ ] I have even solved some edge cases (brownie points) 💪
-- [ ] I added my very planned-out approach to the problem at the end of this README 📜
+- [x] My code's working just fine! 🥳
+- [] I have recorded a video showing it working and embedded it in the README ▶️
+- [x] I have tested all the normal working cases 😎
+- [x] I have even solved some edge cases (brownie points) 💪
+- [x] I added my very planned-out approach to the problem at the end of this README 📜
 
 ## Got Questions❓
 Feel free to check the discussions tab, you might get some help there. Check out that tab before reaching out to us. Also, did you know, the internet is a great place to explore? 😛
@@ -58,5 +58,66 @@ We're available at techhiring@superjoin.ai for all queries.
 
 All the best ✨.
 
+
 ## Developer's Section
-*Add your video here, and your approach to the problem (optional). Leave some comments for us here if you want, we will be reading this :)*
+
+#### Demo Video
+
+
+
+#### Architecture 
+![IMG_4023](https://github.com/user-attachments/assets/e27a06be-e5ee-4bbc-afd2-34cdfc3449c4)
+
+- My Solution is built on event driven architecture using Kafka for high Scalability and performance.
+- Achieved 10,000 edits in 75 - 90 sec.
+- When there is edit in Google sheets, a trigger has been set up using AppScript(service provided by google) this will hit my local server with is exposed using ngrok. 
+- The updated values will be sent to the kafka topic (Sheets2DB) 
+- Consumer form the other end will recieve these values and update the database
+- When there is change in MYSQL database, a trigger has been set up to update event log
+- Producer(DB2Sheets) will poll for every 2 sec and push the data into kafka
+- Conusmer will get those values and update the Google sheets using Google API (Rate limited)
+
+#### Problems faced
+* Finding out that I had to expose my server, the request was not sent from the browser but from GCP
+
+#### Setup
+* Create a virtual Enviornment if needed(preferred)
+* Clone this repository
+* Install all the dependencies
+
+```
+pip install -r requirements.txt
+```
+* Run Kafka the server (preferably with KRAFT)(for windows in command prompt)
+```
+.\bin\windows\kafka-server-start.bat .\config\kraft\server.properties
+```
+
+* Create two Kafka topics 
+```
+.bin\windows\kafka-topics.bat --create --topic Sheets2DB --bootstrap-server localhost:9092
+.bin\windows\kafka-topics.bat --create --topic DB2Sheets --bootstrap-server localhost:9092
+```
+
+
+
+
+Install ngrok to expose local server (DB2Sheets-producer)
+We need to expose the server to receive data when a Google Sheets trigger is sent from GCP.
+
+* Run all the four services in four different terminals
+```
+python consumer_DB2Sheets.py
+python consumer_Sheets2BD.py
+python producer_DB2Sheets.py
+python producer_Sheets2DB.py
+```
+* Expose the port 5000 
+```
+ngrok http 5000
+```
+* Update the Address in the app script(Google sheets) to hit the end point
+
+* Setup MYSQL server and Google Sheets as required
+
+
