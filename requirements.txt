@@ -1,0 +1,6 @@
+flask
+kafka-python
+google-api-python-client
+gspread
+google-auth-oauthlib
+google-auth-httplib2
